@@ -148,19 +148,6 @@ models_dir = "saved_models"
 if not os.path.exists(models_dir):
     os.makedirs(models_dir)
 
-# Change the file extension to '.keras'
-checkpointer = ModelCheckpoint(filepath='saved_models/model_vanilla.keras', # Use '.keras' extension
-                               monitor='val_accuracy', mode='max',
-                               verbose=1, save_best_only=True)
-early_stopping = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=3)
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,patience=2, min_lr=0.001)
-callbacks=[early_stopping, reduce_lr, checkpointer]
-#callbacks
-models_dir = "saved_models"
-if not os.path.exists(models_dir):
-    os.makedirs(models_dir)
-
-# Change the file extension to .keras
 checkpointer = ModelCheckpoint(filepath='saved_models/model_vanilla.keras',
                                monitor='val_accuracy', mode='max',
                                verbose=1, save_best_only=True)
