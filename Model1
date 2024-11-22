@@ -1,0 +1,46 @@
+model_vanilla = tf.keras.Sequential([
+    tf.keras.layers.Conv2D(32,(3,3), activation='relu', input_shape=input_shape),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(32,(3,3),activation='relu',padding='same'),
+    tf.keras.layers.BatchNormalization(axis = 3),
+    tf.keras.layers.MaxPooling2D(pool_size=(2,2),padding='same'),
+    tf.keras.layers.Dropout(0.3),
+
+    tf.keras.layers.Conv2D(64,(3,3),activation='relu',padding='same'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(64,(3,3),activation='relu',padding='same'),
+    tf.keras.layers.BatchNormalization(axis = 3),
+    tf.keras.layers.MaxPooling2D(pool_size=(2,2),padding='same'),
+    tf.keras.layers.Dropout(0.3),
+
+    tf.keras.layers.Conv2D(128,(3,3),activation='relu',padding='same'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv2D(128,(3,3),activation='relu',padding='same'),
+    tf.keras.layers.BatchNormalization(axis = 3),
+    tf.keras.layers.MaxPooling2D(pool_size=(2,2),padding='same'),
+    tf.keras.layers.Dropout(0.5),
+
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(512, activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dropout(0.25),
+    tf.keras.layers.Dense(5, activation='softmax')
+])
+model_vanilla.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model_vanilla.summary()
+#callbacks
+models_dir = "saved_models"
+if not os.path.exists(models_dir):
+    os.makedirs(models_dir)
+
+checkpointer = ModelCheckpoint(filepath='saved_models/model_vanilla.keras',
+                               monitor='val_accuracy', mode='max',
+                               verbose=1, save_best_only=True)
+early_stopping = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=3)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,patience=2, min_lr=0.001)
+callbacks=[early_stopping, reduce_lr, checkpointer]
+history1 = model_vanilla.fit(train_ds, epochs = 10, validation_data = val_ds, callbacks=callbacks)
+model_vanilla.load_weights('saved_models/model_vanilla.keras')
+plot_train_history(history1)
